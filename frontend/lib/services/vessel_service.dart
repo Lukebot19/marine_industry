@@ -45,4 +45,24 @@ class VeesselService {
     }
   }
 
+  // Add a vessel
+  Future<void> addVessel(Vessel vessel) async {
+    APIConfig config = APIConfig();
+    if (config.development) {
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse('${config.API_URL}/vessels/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(vessel.toMap()),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to add vessel');
+    }
+  }
+
 }
