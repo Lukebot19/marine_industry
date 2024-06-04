@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/vessel.dart';
 import 'package:frontend/states/map_state.dart';
+import 'package:frontend/widgets/add_update_vessel_widget.dart';
 import 'package:frontend/widgets/base_widget.dart';
 import 'package:frontend/widgets/mapDrawer.dart';
 import 'package:latlng/latlng.dart';
@@ -19,7 +20,7 @@ class MapPage extends StatefulWidget {
 
 class _MapState extends State<MapPage> {
   Widget _buildMarkerWidget(
-      Vessel vessel, Color color, MapTransformer transformer,
+      Vessel vessel, Color color, MapTransformer transformer, MapState state,
       [IconData icon = Icons.directions_boat]) {
     LatLng position =
         LatLng(Angle.degree(vessel.latitude), Angle.degree(vessel.longitude));
@@ -48,6 +49,31 @@ class _MapState extends State<MapPage> {
                   Text('Latitude: ${vessel.latitude}'),
                 ],
               ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Update'),
+                  onPressed: () {
+                    // Close the current dialog
+                    Navigator.of(context).pop();
+
+                    // Show the VesselDialog in update mode
+                    showDialog(
+                      context: context,
+                      builder: (context) =>
+                          AddUpdateVesselDialog(vessel: vessel, state: state),
+                    );
+                  },
+                ),
+                TextButton(
+                  child: const Text('Delete'),
+                  onPressed: () {
+                    // Delete the vessel from the system
+                    state.deleteVessel(vessel.id);
+                    // Close the dialog
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             ),
           );
         },
@@ -115,8 +141,8 @@ class _MapState extends State<MapPage> {
                 controller: state.controller,
                 builder: (context, transformer) {
                   final markerWidgets = state.vessels.map(
-                    (vessel) =>
-                        _buildMarkerWidget(vessel, Colors.red, transformer),
+                    (vessel) => _buildMarkerWidget(
+                        vessel, Colors.red, transformer, state),
                   );
                   return GestureDetector(
                     behavior: HitTestBehavior.opaque,
@@ -167,6 +193,19 @@ class _MapState extends State<MapPage> {
                     ),
                   );
                 },
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endFloat,
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AddUpdateVesselDialog(
+                      state: state,
+                    ),
+                  );
+                },
+                child: const Icon(Icons.add),
               ),
             ),
           );

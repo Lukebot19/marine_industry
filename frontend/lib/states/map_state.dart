@@ -49,4 +49,45 @@ class MapState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // Add a vessel
+  void addVessel(String name, double longitude, double latitude) {
+    // Call API to add the vessel
+    Vessel vessel = Vessel(
+      id: '5',
+      name: name,
+      longitude: longitude,
+      latitude: latitude,
+    );
+    // Add the vessel to the list of vessels
+    _vessels.add(vessel);
+    if (hasListeners) {
+      notifyListeners();
+    }
+  }
+
+  // Update a vessel
+  void updateVessel(
+      Vessel vessel, String name, double longitude, double latitude) {
+    // Call API to update the vessel
+
+    // Update the vessel with the same id
+    vessel.name = name;
+    vessel.longitude = longitude;
+    vessel.latitude = latitude;
+    // Update the vessel in the list of vessels
+    if (hasListeners) {
+      notifyListeners();
+    }
+  }
+
+  // Delete a vessel
+  void deleteVessel(String id) {
+    // Call API to delete the vessel
+    // Delete the vessel from the list of vessels
+    _vessels.removeWhere((vessel) => vessel.id == id);
+    if (hasListeners) {
+      notifyListeners();
+    }
+  }
 }

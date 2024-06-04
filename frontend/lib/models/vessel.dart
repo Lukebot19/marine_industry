@@ -1,8 +1,8 @@
 class Vessel {
   final String id;
-  final String name;
-  final double longitude;
-  final double latitude;
+  String name;
+  double longitude;
+  double latitude;
 
   Vessel(
       {required this.id,
