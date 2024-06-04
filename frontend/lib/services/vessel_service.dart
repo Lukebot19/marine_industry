@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../API_config.dart';
 
-class VeesselService {
+class VesselService {
 
   // Get all vessels
   Future<List<Vessel>> getVessels() async {
