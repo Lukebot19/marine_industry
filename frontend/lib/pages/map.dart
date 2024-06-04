@@ -95,14 +95,38 @@ class _MapState extends State<MapPage> {
 
     if (scaleDiff > 0) {
       controller.zoom += 0.02;
+
       setState(() {});
     } else if (scaleDiff < 0) {
       controller.zoom -= 0.02;
+      if (controller.zoom < 1) {
+        controller.zoom = 1;
+      }
       setState(() {});
     } else {
       final now = details.focalPoint;
-      final diff = now - _dragStart!;
+      var diff = now - _dragStart!;
       _dragStart = now;
+      final h = transformer.constraints.maxHeight;
+
+      final vp = transformer.getViewport();
+      if (diff.dy < 0 && vp.bottom - diff.dy < h) {
+        diff = Offset(diff.dx, 0);
+      }
+
+      if (diff.dy > 0 && vp.top - diff.dy > 0) {
+        diff = Offset(diff.dx, 0);
+      }
+
+      final w = transformer.constraints.maxWidth;
+      if (diff.dx < 0 && vp.right - diff.dx < w) {
+        diff = Offset(0, diff.dy);
+      }
+
+      if (diff.dx > 0 && vp.left - diff.dx > 0) {
+        diff = Offset(0, diff.dy);
+      }
+
       transformer.drag(diff.dx, diff.dy);
       setState(() {});
     }
