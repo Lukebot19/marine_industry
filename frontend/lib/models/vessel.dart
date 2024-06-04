@@ -4,7 +4,11 @@ class Vessel {
   final double longitude;
   final double latitude;
 
-  Vessel({required this.id, required this.name, required this.longitude,required this.latitude});
+  Vessel(
+      {required this.id,
+      required this.name,
+      required this.longitude,
+      required this.latitude});
 
   // Named constructor that initializes a Vessel from a map
   Vessel.fromMap(Map<String, dynamic> map)
@@ -22,4 +26,12 @@ class Vessel {
       'latitude': latitude,
     };
   }
+
+  // Dummy data
+  static List<Vessel> dummyData = [
+    Vessel(id: '1', name: 'Vessel 1', longitude: 35.674, latitude: 51.41),
+    Vessel(id: '2', name: 'Vessel 2', longitude: 5.678, latitude: 51.41),
+    Vessel(id: '3', name: 'Vessel 3', longitude: 25.682, latitude: 51.41),
+    Vessel(id: '4', name: 'Vessel 4', longitude: 36.686, latitude: 51.41),
+  ];
 }

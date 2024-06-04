@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/vessel.dart';
 import 'package:frontend/states/map_state.dart';
 import 'package:frontend/widgets/base_widget.dart';
 import 'package:frontend/widgets/mapDrawer.dart';
+import 'package:latlng/latlng.dart';
 import 'package:map/map.dart';
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -16,8 +18,12 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapState extends State<MapPage> {
-  Widget _buildMarkerWidget(Offset pos, Color color,
-      [IconData icon = Icons.location_on]) {
+  Widget _buildMarkerWidget(
+      Vessel vessel, Color color, MapTransformer transformer,
+      [IconData icon = Icons.directions_boat]) {
+    LatLng position =
+        LatLng(Angle.degree(vessel.latitude), Angle.degree(vessel.longitude));
+    Offset pos = transformer.toOffset(position);
     return Positioned(
       left: pos.dx - 24,
       top: pos.dy - 24,
@@ -32,8 +38,16 @@ class _MapState extends State<MapPage> {
         onTap: () {
           showDialog(
             context: context,
-            builder: (context) => const AlertDialog(
-              content: Text('You have clicked a marker!'),
+            builder: (context) => AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('Vessel Name: ${vessel.name}'),
+                  Text('Longitude: ${vessel.longitude}'),
+                  Text('Latitude: ${vessel.latitude}'),
+                ],
+              ),
             ),
           );
         },
@@ -81,7 +95,9 @@ class _MapState extends State<MapPage> {
       body: BaseWidget<MapState>(
         state: Provider.of<MapState>(context),
         onStateReady: (state) async {
+          state.setLoading(true);
           await state.getMarkers();
+          state.setLoading(false);
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               setState(() {});
@@ -98,11 +114,9 @@ class _MapState extends State<MapPage> {
               body: MapLayout(
                 controller: state.controller,
                 builder: (context, transformer) {
-                  final markerPositions =
-                      state.markers.map(transformer.toOffset).toList();
-
-                  final markerWidgets = markerPositions.map(
-                    (pos) => _buildMarkerWidget(pos, Colors.red),
+                  final markerWidgets = state.vessels.map(
+                    (vessel) =>
+                        _buildMarkerWidget(vessel, Colors.red, transformer),
                   );
                   return GestureDetector(
                     behavior: HitTestBehavior.opaque,
