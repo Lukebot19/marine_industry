@@ -146,6 +146,7 @@ class _MapState extends State<MapPage> {
         state: Provider.of<MapState>(context),
         onStateReady: (state) async {
           state.setLoading(true);
+          state.connectToWebSocket();
           await state.getMarkers();
           state.setLoading(false);
           WidgetsBinding.instance.addPostFrameCallback((_) {
