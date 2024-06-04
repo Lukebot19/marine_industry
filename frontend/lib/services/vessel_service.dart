@@ -6,22 +6,27 @@ import 'package:http/http.dart' as http;
 import '../API_config.dart';
 
 class VesselService {
-
   // Get all vessels
   Future<List<Vessel>> getVessels() async {
     APIConfig config = APIConfig();
     if (config.development) {
       return Vessel.dummyData;
     }
-
-    final response = await http.get(Uri.parse('${config.API_URL}/vessels/'));
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      List<Vessel> vessels = data.map((e) => Vessel.fromMap(e)).toList();
-      return vessels;
-    } else {
-      throw Exception('Failed to load vessels');
+    try {
+      final response = await http
+          .get(Uri.parse('${config.API_URL}vessels/'), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<Vessel> vessels = data.map((e) => Vessel.fromMap(e)).toList();
+        return vessels;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e);
+      return [];
     }
   }
 
@@ -33,7 +38,7 @@ class VesselService {
     }
 
     final response = await http.put(
-      Uri.parse('${config.API_URL}/vessels/${vessel.id}/'),
+      Uri.parse('${config.API_URL}vessels/${vessel.id}/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -41,12 +46,13 @@ class VesselService {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update vessel');
+      return;
     }
   }
 
   // Add a vessel
-  Future<Vessel?> addVessel(String name, double longitude, double latitude) async {
+  Future<Vessel?> addVessel(
+      String name, double longitude, double latitude) async {
     APIConfig config = APIConfig();
     if (config.development) {
       return null;
@@ -59,7 +65,7 @@ class VesselService {
     };
 
     final response = await http.post(
-      Uri.parse('${config.API_URL}/vessels/'),
+      Uri.parse('${config.API_URL}vessels/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -67,25 +73,25 @@ class VesselService {
     );
 
     if (response.statusCode != 201) {
-      throw Exception('Failed to add vessel');
+      return null;
     }
 
     return Vessel.fromMap(jsonDecode(response.body));
   }
 
   // Retrieve a vessel
-  Future<Vessel> getVessel(String id) async {
+  Future<Vessel?> getVessel(String id) async {
     APIConfig config = APIConfig();
     if (config.development) {
       return Vessel.dummyData.firstWhere((element) => element.id == id);
     }
 
-    final response = await http.get(Uri.parse('${config.API_URL}/vessels/$id/'));
+    final response = await http.get(Uri.parse('${config.API_URL}vessels/$id/'));
 
     if (response.statusCode == 200) {
       return Vessel.fromMap(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to load vessel');
+      return null;
     }
   }
 
@@ -96,11 +102,11 @@ class VesselService {
       return;
     }
 
-    final response = await http.delete(Uri.parse('${config.API_URL}/vessels/$id/'));
+    final response =
+        await http.delete(Uri.parse('${config.API_URL}vessels/$id/'));
 
     if (response.statusCode != 204) {
-      throw Exception('Failed to delete vessel');
+      return;
     }
   }
-
 }

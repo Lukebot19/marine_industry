@@ -51,6 +51,7 @@ else:
 
 
 ALLOWED_HOSTS = ["*"]
+CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 STATIC_URL = "/static/api/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")

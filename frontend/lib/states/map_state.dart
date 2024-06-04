@@ -37,8 +37,8 @@ class MapState extends ChangeNotifier {
   // Retrieve the markers from the backend
   Future<void> getMarkers() async {
     // Call the backend
-    // For now, we will use dummy data
-    setVessels(Vessel.dummyData);
+    List<Vessel> vessels = await _vesselService.getVessels();
+    setVessels(vessels);
   }
 
   // Select a vessel
