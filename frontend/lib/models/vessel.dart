@@ -4,7 +4,11 @@ class Vessel {
   final double longitude;
   final double latitude;
 
-  Vessel({required this.id, required this.name, required this.longitude,required this.latitude});
+  Vessel(
+      {required this.id,
+      required this.name,
+      required this.longitude,
+      required this.latitude});
 
   // Named constructor that initializes a Vessel from a map
   Vessel.fromMap(Map<String, dynamic> map)
