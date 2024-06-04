@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/vessel.dart';
+import 'package:frontend/services/vessel_service.dart';
 import 'package:latlng/latlng.dart';
 import 'package:map/map.dart';
 
@@ -11,6 +12,7 @@ class MapState extends ChangeNotifier {
     zoom: 2,
   );
   bool _loading = false;
+  VesselService _vesselService = VesselService();
 
   // Getters
   MapController get controller => _controller;
@@ -51,16 +53,14 @@ class MapState extends ChangeNotifier {
   }
 
   // Add a vessel
-  void addVessel(String name, double longitude, double latitude) {
+  void addVessel(String name, double longitude, double latitude) async {
     // Call API to add the vessel
-    Vessel vessel = Vessel(
-      id: '5',
-      name: name,
-      longitude: longitude,
-      latitude: latitude,
-    );
+    Vessel? tempVessel =
+        await _vesselService.addVessel(name, longitude, latitude);
     // Add the vessel to the list of vessels
-    _vessels.add(vessel);
+    if (tempVessel != null) {
+      _vessels.add(tempVessel);
+    }
     if (hasListeners) {
       notifyListeners();
     }
@@ -68,9 +68,9 @@ class MapState extends ChangeNotifier {
 
   // Update a vessel
   void updateVessel(
-      Vessel vessel, String name, double longitude, double latitude) {
+      Vessel vessel, String name, double longitude, double latitude) async {
     // Call API to update the vessel
-
+    await _vesselService.updateVessel(vessel);
     // Update the vessel with the same id
     vessel.name = name;
     vessel.longitude = longitude;
@@ -82,8 +82,9 @@ class MapState extends ChangeNotifier {
   }
 
   // Delete a vessel
-  void deleteVessel(String id) {
+  void deleteVessel(String id) async {
     // Call API to delete the vessel
+    await _vesselService.deleteVessel(id);
     // Delete the vessel from the list of vessels
     _vessels.removeWhere((vessel) => vessel.id == id);
     if (hasListeners) {

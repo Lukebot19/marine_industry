@@ -46,23 +46,31 @@ class VesselService {
   }
 
   // Add a vessel
-  Future<void> addVessel(Vessel vessel) async {
+  Future<Vessel?> addVessel(String name, double longitude, double latitude) async {
     APIConfig config = APIConfig();
     if (config.development) {
-      return;
+      return null;
     }
+
+    Map tempVessel = {
+      'name': name,
+      'longitude': longitude,
+      'latitude': latitude,
+    };
 
     final response = await http.post(
       Uri.parse('${config.API_URL}/vessels/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(vessel.toMap()),
+      body: jsonEncode(tempVessel),
     );
 
     if (response.statusCode != 201) {
       throw Exception('Failed to add vessel');
     }
+
+    return Vessel.fromMap(jsonDecode(response.body));
   }
 
   // Retrieve a vessel
