@@ -29,12 +29,7 @@ from vessels.urls import router as vessels_router
 
 # Base API Root
 router = DefaultRouter()
-# You can add urls either by app or by individual viewset
-# Examples
-#   By endpoint:
-#       from api.users.viewsets import UserViewSet
-#       router.register(r"users", UserViewSet, basename="users")
-#   By App:
+
 app_routers = [
     vessels_router.registry,
 ]
@@ -55,14 +50,10 @@ schema_view = get_schema_view(
     permission_classes=[AllowAny],
 )
 
-# Obtain a reference to the DefaultAdmin using admin.site
-# and update the default values to customise the titles
 admin.site.site_title = _("Vessels Admin")
 admin.site.site_header = _("Vessels Administration")
 admin.site.index_title = _("Control Center Home")
 
-# Don't edit/add urlpatterns here, this section should only change for
-# external apps or new versioning of endpoints.
 urlpatterns = [
     path("api/admin/", admin.site.urls),
     # DRF API Viewer Login/Logout
@@ -90,8 +81,7 @@ urlpatterns = [
             "font-family: Helvetica, Sans-Serif; font-size: 1.2em;"
             'margin: 20vh auto;">'
             "<p>Please navigate to:</p>"
-            "<p>> <a href='/api/admin/'>/api/admin/</a> for TickEx Admin</p>"
-            "<p>> <a href='/api/auth/'>/api/auth/</a> for API Viewer login </p>"
+            "<p>> <a href='/api/admin/'>/api/admin/</a> for Vessel API Admin</p>"
             "<p>> <a href='/api/v1/'>/api/v1/</a> for current endpoints</p>"
             "<p>> <a href='/api/docs/'>/api/docs/</a> for an API Spec</p>"
             "<p>> <a href='/api/swagger.json'>/api/swagger.json</a> to download API Spec</p>"
@@ -101,13 +91,13 @@ urlpatterns = [
         ),
         name="api-test",
     ),
-    # Endpoint for API Health Checks (when using NGINX please use api/ for health checks.)
+
     path(
         "",
         lambda _: HttpResponse(
             '<div style="max-width: 400px;font-family: Helvetica, Sans-Serif;'
             'font-size: 1.2em;margin: 20vh auto;">'
-            '<p>"<strong>200 OK.</strong> Welcome to the TickEx API."</p>'
+            '<p>"<strong>200 OK.</strong> Welcome to the Vessel API."</p>'
             "</div>",
             headers={"content-type": "text/html"},
             status=200,
