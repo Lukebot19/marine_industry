@@ -43,7 +43,7 @@ class MapState extends ChangeNotifier {
   void selectVessel(Vessel vessel) {
     // Zoom in the map to the selected vessel
     _controller.center =
-        LatLng(Angle.degree(vessel.longitude), Angle.degree(vessel.latitude));
+        LatLng(Angle.degree(vessel.latitude), Angle.degree(vessel.longitude));
     _controller.zoom = 7;
     if (hasListeners) {
       notifyListeners();
