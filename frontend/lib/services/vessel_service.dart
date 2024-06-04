@@ -65,4 +65,20 @@ class VeesselService {
     }
   }
 
+  // Retrieve a vessel
+  Future<Vessel> getVessel(String id) async {
+    APIConfig config = APIConfig();
+    if (config.development) {
+      return Vessel.dummyData.firstWhere((element) => element.id == id);
+    }
+
+    final response = await http.get(Uri.parse('${config.API_URL}/vessels/$id/'));
+
+    if (response.statusCode == 200) {
+      return Vessel.fromMap(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load vessel');
+    }
+  }
+
 }
