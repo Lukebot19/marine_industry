@@ -56,5 +56,14 @@ class MapState extends ChangeNotifier {
     setMarkers(tempMarkers);
   }
 
-
+  // Select a vessel
+  void selectVessel(Vessel vessel) {
+    // Zoom in the map to the selected vessel
+    _controller.center =
+        LatLng(Angle.degree(vessel.longitude), Angle.degree(vessel.latitude));
+    _controller.zoom = 7;
+    if (hasListeners) {
+      notifyListeners();
+    }
+  }
 }
