@@ -22,17 +22,23 @@ class MapState extends ChangeNotifier {
   // Setters
   void setMarkers(List<LatLng> markers) {
     _markers = markers;
-    notifyListeners();
+    if (hasListeners) {
+      notifyListeners();
+    }
   }
 
   void setVessels(List<Vessel> vessels) {
     _vessels = vessels;
-    notifyListeners();
+    if (hasListeners) {
+      notifyListeners();
+    }
   }
 
   void setLoading(bool loading) {
     _loading = loading;
-    notifyListeners();
+    if (hasListeners) {
+      notifyListeners();
+    }
   }
 
   // Retrieve the markers from the backend
@@ -49,4 +55,6 @@ class MapState extends ChangeNotifier {
     // Set the markers
     setMarkers(tempMarkers);
   }
+
+
 }

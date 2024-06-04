@@ -29,7 +29,8 @@ class mapDrawer extends StatelessWidget {
                             return ListTile(
                               title: Text(vessel.name),
                               onTap: () {
-                                // Provider.of<MapState>(context, listen: false).selectVessel(vessel);
+                                Provider.of<MapState>(context, listen: false)
+                                    .selectVessel(vessel);
                                 Navigator.pop(context);
                               },
                             );
