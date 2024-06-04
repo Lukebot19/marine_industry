@@ -81,4 +81,18 @@ class VesselService {
     }
   }
 
+  // Delete a vessel
+  Future<void> deleteVessel(String id) async {
+    APIConfig config = APIConfig();
+    if (config.development) {
+      return;
+    }
+
+    final response = await http.delete(Uri.parse('${config.API_URL}/vessels/$id/'));
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete vessel');
+    }
+  }
+
 }
