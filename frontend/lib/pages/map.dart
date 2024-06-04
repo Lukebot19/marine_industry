@@ -81,7 +81,9 @@ class _MapState extends State<MapPage> {
       body: BaseWidget<MapState>(
         state: Provider.of<MapState>(context),
         onStateReady: (state) async {
+          state.setLoading(true);
           await state.getMarkers();
+          state.setLoading(false);
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               setState(() {});

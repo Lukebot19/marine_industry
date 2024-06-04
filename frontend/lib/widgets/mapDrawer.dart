@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/states/map_state.dart';
+import 'package:provider/provider.dart';
 
 class mapDrawer extends StatelessWidget {
   const mapDrawer({
@@ -8,31 +10,38 @@ class mapDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
+      child: Stack(
         children: <Widget>[
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text('Drawer Header'),
+          ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+                child: Text('Drawer Header'),
+              ),
+              Provider.of<MapState>(context).isLoading == false
+                  ? Column(
+                      children: [
+                        ...Provider.of<MapState>(context).vessels.map(
+                          (vessel) {
+                            return ListTile(
+                              title: Text(vessel.name),
+                              onTap: () {
+                                // Provider.of<MapState>(context, listen: false).selectVessel(vessel);
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  : Container(),
+            ],
           ),
-          ListTile(
-            title: const Text('Item 1'),
-            onTap: () {
-              // Update the state of the app
-              // Then close the drawer
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: const Text('Item 2'),
-            onTap: () {
-              // Update the state of the app
-              // Then close the drawer
-              Navigator.pop(context);
-            },
-          ),
+          if (Provider.of<MapState>(context).isLoading)
+            Center(child: CircularProgressIndicator()),
         ],
       ),
     );
