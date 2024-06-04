@@ -13,8 +13,8 @@ class VesselService {
       return Vessel.dummyData;
     }
     try {
-      final response = await http
-          .get(Uri.parse('${config.API_URL}vessels/'), headers: {
+      final response =
+          await http.get(Uri.parse('${config.API_URL}vessels/'), headers: {
         'Content-Type': 'application/json',
       }).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
@@ -25,7 +25,6 @@ class VesselService {
         return [];
       }
     } catch (e) {
-      print(e);
       return [];
     }
   }
@@ -36,16 +35,20 @@ class VesselService {
     if (config.development) {
       return;
     }
+    try {
+      final response = await http.put(
+        Uri.parse('${config.API_URL}vessels/${vessel.id}/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(vessel.toMap()),
+      );
 
-    final response = await http.put(
-      Uri.parse('${config.API_URL}vessels/${vessel.id}/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(vessel.toMap()),
-    );
-
-    if (response.statusCode != 200) {
+      if (response.statusCode != 200) {
+        return;
+      }
+    } catch (e) {
+      print(e);
       return;
     }
   }
@@ -63,20 +66,24 @@ class VesselService {
       'longitude': longitude,
       'latitude': latitude,
     };
+    try {
+      final response = await http.post(
+        Uri.parse('${config.API_URL}vessels/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(tempVessel),
+      );
 
-    final response = await http.post(
-      Uri.parse('${config.API_URL}vessels/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(tempVessel),
-    );
+      if (response.statusCode != 201) {
+        return null;
+      }
 
-    if (response.statusCode != 201) {
+      return Vessel.fromMap(jsonDecode(response.body));
+    } catch (e) {
+      print(e);
       return null;
     }
-
-    return Vessel.fromMap(jsonDecode(response.body));
   }
 
   // Retrieve a vessel
@@ -85,27 +92,36 @@ class VesselService {
     if (config.development) {
       return Vessel.dummyData.firstWhere((element) => element.id == id);
     }
+    try {
+      final response =
+          await http.get(Uri.parse('${config.API_URL}vessels/$id/'));
 
-    final response = await http.get(Uri.parse('${config.API_URL}vessels/$id/'));
-
-    if (response.statusCode == 200) {
-      return Vessel.fromMap(jsonDecode(response.body));
-    } else {
+      if (response.statusCode == 200) {
+        return Vessel.fromMap(jsonDecode(response.body));
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
       return null;
     }
   }
 
   // Delete a vessel
-  Future<void> deleteVessel(String id) async {
+  Future<void> deleteVessel(int id) async {
     APIConfig config = APIConfig();
     if (config.development) {
       return;
     }
+    try {
+      final response =
+          await http.delete(Uri.parse('${config.API_URL}vessels/$id/'));
 
-    final response =
-        await http.delete(Uri.parse('${config.API_URL}vessels/$id/'));
-
-    if (response.statusCode != 204) {
+      if (response.statusCode != 204) {
+        return;
+      }
+    } catch (e) {
+      print(e);
       return;
     }
   }

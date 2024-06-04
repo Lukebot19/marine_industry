@@ -69,12 +69,12 @@ class MapState extends ChangeNotifier {
   // Update a vessel
   void updateVessel(
       Vessel vessel, String name, double longitude, double latitude) async {
-    // Call API to update the vessel
-    await _vesselService.updateVessel(vessel);
     // Update the vessel with the same id
     vessel.name = name;
     vessel.longitude = longitude;
     vessel.latitude = latitude;
+    // Call API to update the vessel
+    await _vesselService.updateVessel(vessel);
     // Update the vessel in the list of vessels
     if (hasListeners) {
       notifyListeners();
@@ -82,7 +82,7 @@ class MapState extends ChangeNotifier {
   }
 
   // Delete a vessel
-  void deleteVessel(String id) async {
+  void deleteVessel(int id) async {
     // Call API to delete the vessel
     await _vesselService.deleteVessel(id);
     // Delete the vessel from the list of vessels
