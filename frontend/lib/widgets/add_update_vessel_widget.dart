@@ -73,6 +73,20 @@ class _AddUpdateVesselDialogState extends State<AddUpdateVesselDialog> {
             if (nameController.text.isNotEmpty &&
                 longitudeController.text.isNotEmpty &&
                 latitudeController.text.isNotEmpty) {
+              if (double.parse(longitudeController.text) >= 180 ||
+                  double.parse(longitudeController.text) <= -180) {
+                setState(() {
+                  errorMessage = 'Longitude must be between -180 and 180';
+                });
+                return;
+              }
+              if (double.parse(latitudeController.text) >= 90 ||
+                  double.parse(latitudeController.text) <= -90) {
+                setState(() {
+                  errorMessage = 'Latitude must be between -90 and 90';
+                });
+                return;
+              }
               widget.vessel == null
                   ? widget.state.addVessel(
                       nameController.text,

@@ -22,8 +22,16 @@ class _MapState extends State<MapPage> {
   Widget _buildMarkerWidget(
       Vessel vessel, Color color, MapTransformer transformer, MapState state,
       [IconData icon = Icons.directions_boat]) {
+    double longitude = vessel.longitude;
+    while (longitude > 180) {
+      longitude -= 360;
+    }
+    while (longitude < -180) {
+      longitude += 360;
+    }
+
     LatLng position =
-        LatLng(Angle.degree(vessel.latitude), Angle.degree(vessel.longitude));
+        LatLng(Angle.degree(vessel.latitude), Angle.degree(longitude));
     Offset pos = transformer.toOffset(position);
     return Positioned(
       left: pos.dx - 24,
