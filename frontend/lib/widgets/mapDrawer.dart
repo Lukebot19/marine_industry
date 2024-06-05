@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/states/map_state.dart';
+import 'package:frontend/bloc/map_bloc.dart';
 import 'package:provider/provider.dart';
 
 class mapDrawer extends StatefulWidget {
@@ -17,7 +17,7 @@ class _mapDrawerState extends State<mapDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    var vessels = Provider.of<MapState>(context).vessels;
+    var vessels = context.read<MapBloc>().state.vessels;
     var filteredVessels = vessels
         .where((vessel) =>
             vessel.name.toLowerCase().contains(filter.toLowerCase()))
@@ -67,7 +67,7 @@ class _mapDrawerState extends State<mapDrawer> {
                   ],
                 ),
               ),
-              Provider.of<MapState>(context).isLoading == false
+              context.read<MapBloc>().state.loading == false
                   ? Column(
                       children: [
                         ...filteredVessels.map(
@@ -75,8 +75,11 @@ class _mapDrawerState extends State<mapDrawer> {
                             return ListTile(
                               title: Text(vessel.name),
                               onTap: () {
-                                Provider.of<MapState>(context, listen: false)
-                                    .selectVessel(vessel);
+                                context.read<MapBloc>().add(
+                                      VesselSelect(
+                                        vessel,
+                                      ),
+                                    );
                                 Navigator.pop(context);
                               },
                             );
@@ -87,7 +90,7 @@ class _mapDrawerState extends State<mapDrawer> {
                   : Container(),
             ],
           ),
-          if (Provider.of<MapState>(context).isLoading)
+          if (context.read<MapBloc>().state.loading == true)
             const Center(child: CircularProgressIndicator()),
         ],
       ),
