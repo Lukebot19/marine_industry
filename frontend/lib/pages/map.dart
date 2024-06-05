@@ -36,12 +36,23 @@ class _MapState extends State<MapPage> {
       left: pos.dx - 24,
       top: pos.dy - 24,
       width: 48,
-      height: 48,
+      height: 60,
       child: GestureDetector(
-        child: Icon(
-          icon,
-          color: color,
-          size: 48,
+        child: Column(
+          children: [
+            Text(
+              vessel.name,
+              style: TextStyle(
+                color: color,
+              ),
+            ),
+            SizedBox(height: 3),
+            Icon(
+              icon,
+              color: color,
+              size: 37,
+            ),
+          ],
         ),
         onTap: () {
           showDialog(
@@ -180,7 +191,7 @@ class _MapState extends State<MapPage> {
                         final delta = event.scrollDelta.dy / -1000.0;
                         final zoom =
                             clamp(state.controller.zoom + delta, 2, 18);
-    
+
                         transformer.setZoomInPlace(zoom, event.localPosition);
                         setState(() {});
                       }
@@ -190,21 +201,21 @@ class _MapState extends State<MapPage> {
                         TileLayer(
                           builder: (context, x, y, z) {
                             final tilesInZoom = pow(2.0, z).floor();
-    
+
                             while (x < 0) {
                               x += tilesInZoom;
                             }
                             while (y < 0) {
                               y += tilesInZoom;
                             }
-    
+
                             x %= tilesInZoom;
                             y %= tilesInZoom;
-    
+
                             //Google Maps
                             final url =
                                 'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
-    
+
                             return CachedNetworkImage(
                               imageUrl: url,
                               fit: BoxFit.cover,
@@ -218,8 +229,7 @@ class _MapState extends State<MapPage> {
                 );
               },
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.endFloat,
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 showDialog(
