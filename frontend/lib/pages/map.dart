@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/map_bloc.dart';
 import 'package:frontend/models/vessel.dart';
-import 'package:frontend/states/map_state.dart';
 import 'package:frontend/widgets/add_update_vessel_widget.dart';
-import 'package:frontend/widgets/base_widget.dart';
 import 'package:frontend/widgets/mapDrawer.dart';
 import 'package:latlng/latlng.dart';
 import 'package:map/map.dart';
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
-import 'package:provider/provider.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -19,8 +18,8 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapState extends State<MapPage> {
-  Widget _buildMarkerWidget(
-      Vessel vessel, Color color, MapTransformer transformer, MapState state,
+  Widget _buildMarkerWidget(Vessel vessel, Color color,
+      MapTransformer transformer, MapState state, BuildContext passedContext,
       [IconData icon = Icons.directions_boat]) {
     double longitude = vessel.longitude;
     while (longitude > 180) {
@@ -67,8 +66,9 @@ class _MapState extends State<MapPage> {
                     // Show the VesselDialog in update mode
                     showDialog(
                       context: context,
-                      builder: (context) =>
-                          AddUpdateVesselDialog(vessel: vessel, state: state),
+                      builder: (context) => AddUpdateVesselDialog(
+                        vessel: vessel,
+                      ),
                     );
                   },
                 ),
@@ -76,7 +76,11 @@ class _MapState extends State<MapPage> {
                   child: const Text('Delete'),
                   onPressed: () {
                     // Delete the vessel from the system
-                    state.deleteVessel(vessel.id);
+                    passedContext.read<MapBloc>().add(
+                          VesselDelete(
+                            vessel.id,
+                          ),
+                        );
                     // Close the dialog
                     Navigator.of(context).pop();
                   },
@@ -149,101 +153,85 @@ class _MapState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BaseWidget<MapState>(
-        state: Provider.of<MapState>(context),
-        onStateReady: (state) async {
-          state.setLoading(true);
-          state.connectToWebSocket();
-          await state.getMarkers();
-          state.setLoading(false);
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {});
-            }
-          });
-        },
-        builder: (context, state, child) {
-          return SafeArea(
-            child: Scaffold(
-              appBar: AppBar(
-                title: const Text('Map Page'),
-              ),
-              drawer: const mapDrawer(),
-              body: MapLayout(
-                controller: state.controller,
-                builder: (context, transformer) {
-                  final markerWidgets = state.vessels.map(
-                    (vessel) => _buildMarkerWidget(
-                        vessel, Colors.red, transformer, state),
-                  );
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onScaleStart: _onScaleStart,
-                    onScaleUpdate: (details) =>
-                        _onScaleUpdate(details, transformer, state.controller),
-                    child: Listener(
-                      behavior: HitTestBehavior.opaque,
-                      onPointerSignal: (event) {
-                        if (event is PointerScrollEvent) {
-                          final delta = event.scrollDelta.dy / -1000.0;
-                          final zoom =
-                              clamp(state.controller.zoom + delta, 2, 18);
-
-                          transformer.setZoomInPlace(zoom, event.localPosition);
-                          setState(() {});
-                        }
-                      },
-                      child: Stack(
-                        children: [
-                          TileLayer(
-                            builder: (context, x, y, z) {
-                              final tilesInZoom = pow(2.0, z).floor();
-
-                              while (x < 0) {
-                                x += tilesInZoom;
-                              }
-                              while (y < 0) {
-                                y += tilesInZoom;
-                              }
-
-                              x %= tilesInZoom;
-                              y %= tilesInZoom;
-
-                              //Google Maps
-                              final url =
-                                  'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
-
-                              return CachedNetworkImage(
-                                imageUrl: url,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
-                          ...markerWidgets,
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.endFloat,
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AddUpdateVesselDialog(
-                      state: state,
-                    ),
-                  );
-                },
-                child: const Icon(Icons.add),
-              ),
+    return BlocBuilder<MapBloc, MapState>(
+      builder: (context, state) {
+        return SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Map Page'),
             ),
-          );
-        },
-      ),
+            drawer: const mapDrawer(),
+            body: MapLayout(
+              controller: state.controller,
+              builder: (context, transformer) {
+                final markerWidgets = state.vessels.map(
+                  (vessel) => _buildMarkerWidget(
+                      vessel, Colors.red, transformer, state, context),
+                );
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onScaleStart: _onScaleStart,
+                  onScaleUpdate: (details) =>
+                      _onScaleUpdate(details, transformer, state.controller),
+                  child: Listener(
+                    behavior: HitTestBehavior.opaque,
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent) {
+                        final delta = event.scrollDelta.dy / -1000.0;
+                        final zoom =
+                            clamp(state.controller.zoom + delta, 2, 18);
+    
+                        transformer.setZoomInPlace(zoom, event.localPosition);
+                        setState(() {});
+                      }
+                    },
+                    child: Stack(
+                      children: [
+                        TileLayer(
+                          builder: (context, x, y, z) {
+                            final tilesInZoom = pow(2.0, z).floor();
+    
+                            while (x < 0) {
+                              x += tilesInZoom;
+                            }
+                            while (y < 0) {
+                              y += tilesInZoom;
+                            }
+    
+                            x %= tilesInZoom;
+                            y %= tilesInZoom;
+    
+                            //Google Maps
+                            final url =
+                                'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
+    
+                            return CachedNetworkImage(
+                              imageUrl: url,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                        ...markerWidgets,
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endFloat,
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => AddUpdateVesselDialog(),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+          ),
+        );
+      },
     );
   }
 }
