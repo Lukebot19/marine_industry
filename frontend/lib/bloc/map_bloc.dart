@@ -24,6 +24,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             ),
           ),
         ) {
+    on<CenterMap>((event, emit) {
+      state.controller.center = const LatLng(
+        Angle.degree(35.675),
+        Angle.degree(51.41),
+      );
+      state.controller.zoom = 2;
+
+      // Emit a new state with the new controller
+      emit(state.copyWith(controller: state.controller));
+    });
     on<GetMarkers>((event, emit) async {
       emit(state.copyWith(loading: true));
 

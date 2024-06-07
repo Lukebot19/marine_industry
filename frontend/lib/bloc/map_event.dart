@@ -4,6 +4,8 @@ class MapEvent {}
 
 class GetMarkers extends MapEvent {}
 
+class CenterMap extends MapEvent {}
+
 class WebSocketDelete extends MapEvent {
   final int id;
 

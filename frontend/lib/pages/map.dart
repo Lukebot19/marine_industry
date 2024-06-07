@@ -230,14 +230,26 @@ class _MapState extends State<MapPage> {
               },
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => AddUpdateVesselDialog(),
-                );
-              },
-              child: const Icon(Icons.add),
+            floatingActionButton: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    context.read<MapBloc>().add(CenterMap());
+                  },
+                  child: const Icon(Icons.center_focus_weak_rounded),
+                ),
+                SizedBox(height: 10),
+                FloatingActionButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => AddUpdateVesselDialog(),
+                    );
+                  },
+                  child: const Icon(Icons.add),
+                ),
+              ],
             ),
           ),
         );
